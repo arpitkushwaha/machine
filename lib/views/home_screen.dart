@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int page=0;
   String imageData;
+  List<Images> imagesList =[];
   @override
   void initState() {
     // TODO: implement initState
@@ -105,11 +106,11 @@ class _HomeScreenState extends State<HomeScreen> {
       var response = await dio.post("http://dev3.xicom.us/xttest/getdata.php", data: formData);
       //print(response.data);
       DataModel data = DataModel.fromJson(json.decode(response.data));
-      List<Images> imagesList = data.images;
-      if(imagesList.length == 0)
-        {
-          page=0;
-        }
+
+      data.images.forEach((element) {
+        imagesList.add(element);
+      });
+
       print("page === $page");
       return imagesList;
 
@@ -120,13 +121,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   downloadImage(String url, String id) async
   {
-      var response = await http.get(Uri.parse(url)); // <--2
+      var response = await http.get(Uri.parse(url));
       var documentDirectory = await getApplicationDocumentsDirectory();
       var firstPath = documentDirectory.path + "/images";
       var filePathAndName = documentDirectory.path + '/images/${id}.jpg';
-      await Directory(firstPath).create(recursive: true); // <-- 1
-      File file2 = new File(filePathAndName);             // <-- 2
-      file2.writeAsBytesSync(response.bodyBytes);         // <-- 3
+      await Directory(firstPath).create(recursive: true);
+      File file2 = new File(filePathAndName);
+      file2.writeAsBytesSync(response.bodyBytes);
       setState(() {
         imageData = filePathAndName;
       });
